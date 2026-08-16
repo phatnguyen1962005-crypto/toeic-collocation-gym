@@ -3,9 +3,10 @@ export type Collocation = {
   vi: string;
   en: string;
   topic: string;
-  kind?: "verb-pattern" | "preposition";
+  kind?: "verb-pattern" | "preposition" | "speaking";
   pattern?: string;
   note?: string;
+  chunkStep?: number;
 };
 
 const baseCollocations: Collocation[] = [
@@ -583,6 +584,99 @@ const writingPrepositions = makePrepositions(485, "Giới từ · Cụm Writing"
   { vi: "xảy ra hoặc có hiệu lực trước", en: "be prior to + N/V-ing" },
 ]);
 
+type IdeaRoute = {
+  title: string;
+  chunks: [string, string, string, string, string];
+};
+
+const speakingRoutes: IdeaRoute[] = [
+  {
+    title: "Time & productivity",
+    chunks: ["save time", "focus on important tasks", "complete tasks more quickly", "reduce delays", "improve productivity"],
+  },
+  {
+    title: "Money & value",
+    chunks: ["reduce unnecessary costs", "control spending more effectively", "spend money on higher priorities", "get better long-term value", "improve financial stability"],
+  },
+  {
+    title: "Stress & performance",
+    chunks: ["reduce daily stress", "stay mentally refreshed", "concentrate better", "make fewer mistakes", "improve overall performance"],
+  },
+  {
+    title: "Better decisions",
+    chunks: ["access reliable information", "compare different alternatives", "evaluate advantages and disadvantages", "make informed decisions", "avoid poor choices"],
+  },
+  {
+    title: "Practical experience",
+    chunks: ["gain practical experience", "apply theory to real situations", "develop useful skills", "build confidence", "prepare for future work"],
+  },
+  {
+    title: "Communication",
+    chunks: ["exchange ideas openly", "hear different viewpoints", "understand one another better", "avoid misunderstandings", "strengthen relationships"],
+  },
+  {
+    title: "Teamwork",
+    chunks: ["combine different strengths", "divide responsibilities clearly", "support one another", "solve problems faster", "achieve shared goals"],
+  },
+  {
+    title: "Career growth",
+    chunks: ["meet experienced professionals", "build valuable connections", "learn about new opportunities", "strengthen a professional profile", "expand career opportunities"],
+  },
+  {
+    title: "Motivation",
+    chunks: ["set clear and realistic goals", "track progress regularly", "stay motivated", "maintain consistent effort", "achieve better results"],
+  },
+  {
+    title: "Flexibility",
+    chunks: ["have more choices", "adapt to personal needs", "manage time more flexibly", "handle responsibilities more easily", "improve quality of life"],
+  },
+  {
+    title: "Health & energy",
+    chunks: ["get enough rest and exercise", "restore energy", "sharpen concentration", "maintain consistent performance", "protect long-term health"],
+  },
+  {
+    title: "Safety",
+    chunks: ["identify possible risks early", "follow proper procedures", "prevent mistakes and accidents", "protect people and property", "reduce delays and costs"],
+  },
+  {
+    title: "Environment",
+    chunks: ["use fewer resources", "create less waste", "lower pollution", "protect the natural environment", "improve community quality of life"],
+  },
+  {
+    title: "Creativity",
+    chunks: ["consider different perspectives", "think more critically", "generate practical ideas", "find better solutions", "support innovation"],
+  },
+  {
+    title: "Learning",
+    chunks: ["focus on weak areas", "correct mistakes", "remember information longer", "improve knowledge and skills", "become a more independent learner"],
+  },
+  {
+    title: "Customer service",
+    chunks: ["understand customer needs", "respond quickly and clearly", "provide better service", "build customer trust", "increase satisfaction and loyalty"],
+  },
+  {
+    title: "Work-life balance",
+    chunks: ["set reasonable workloads", "allow enough recovery time", "reduce stress and burnout", "increase job satisfaction", "retain skilled employees"],
+  },
+  {
+    title: "Relationships",
+    chunks: ["spend quality time together", "communicate openly", "understand each other's feelings", "provide mutual support", "build stronger relationships"],
+  },
+];
+
+const speakingChunks: Collocation[] = speakingRoutes.flatMap((route, routeIndex) =>
+  route.chunks.slice(0, -1).map((_, stepIndex) => ({
+    id: 506 + routeIndex * 4 + stepIndex,
+    vi: route.title,
+    en: route.chunks[stepIndex + 1],
+    topic: `Speaking Sprint · ${route.title}`,
+    kind: "speaking" as const,
+    pattern: `${route.chunks.slice(0, stepIndex + 1).join(" → ")} → ___`,
+    note: "Say the complete chain aloud before the next question appears.",
+    chunkStep: stepIndex + 1,
+  })),
+);
+
 export const collocations: Collocation[] = [
   ...baseCollocations,
   ...verbToInfinitive,
@@ -592,4 +686,5 @@ export const collocations: Collocation[] = [
   ...objectPrepositions,
   ...prepositionalTo,
   ...writingPrepositions,
+  ...speakingChunks,
 ];
