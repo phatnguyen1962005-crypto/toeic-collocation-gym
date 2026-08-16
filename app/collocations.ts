@@ -662,6 +662,94 @@ const speakingRoutes: IdeaRoute[] = [
     title: "Relationships",
     chunks: ["spend quality time together", "communicate openly", "understand each other's feelings", "provide mutual support", "build stronger relationships"],
   },
+  {
+    title: "Convenience & access",
+    chunks: ["improve access to services", "reduce travel time", "make daily tasks more convenient", "serve more people effectively", "improve overall satisfaction"],
+  },
+  {
+    title: "Technology & efficiency",
+    chunks: ["automate repetitive tasks", "process information faster", "reduce human error", "improve work efficiency", "allow people to focus on complex work"],
+  },
+  {
+    title: "Online learning",
+    chunks: ["access lessons from anywhere", "learn at a personal pace", "review difficult material repeatedly", "use time more effectively", "achieve better learning outcomes"],
+  },
+  {
+    title: "Information sharing",
+    chunks: ["share information instantly", "keep everyone updated", "coordinate activities more effectively", "respond to changes quickly", "avoid unnecessary confusion"],
+  },
+  {
+    title: "Public transportation",
+    chunks: ["reduce the number of private vehicles", "ease traffic congestion", "shorten commuting time", "lower air pollution", "improve urban quality of life"],
+  },
+  {
+    title: "Community development",
+    chunks: ["bring local people together", "encourage active participation", "address common concerns", "create practical improvements", "build a stronger community"],
+  },
+  {
+    title: "Leadership",
+    chunks: ["communicate a clear direction", "assign tasks fairly", "encourage team members", "handle conflicts effectively", "improve team performance"],
+  },
+  {
+    title: "Employee training",
+    chunks: ["update professional knowledge", "practice job-related skills", "handle tasks more confidently", "provide higher-quality work", "support long-term career growth"],
+  },
+  {
+    title: "Useful feedback",
+    chunks: ["identify strengths and weaknesses", "understand areas for improvement", "adjust strategies quickly", "make steady progress", "achieve higher standards"],
+  },
+  {
+    title: "Effective planning",
+    chunks: ["define clear priorities", "allocate resources effectively", "anticipate possible problems", "prepare practical solutions", "complete projects successfully"],
+  },
+  {
+    title: "Remote work",
+    chunks: ["eliminate daily commuting", "create a flexible schedule", "balance work and personal responsibilities", "reduce stress", "maintain job satisfaction"],
+  },
+  {
+    title: "Face-to-face interaction",
+    chunks: ["observe body language", "receive immediate feedback", "clarify ideas quickly", "build mutual trust", "communicate more effectively"],
+  },
+  {
+    title: "Healthy competition",
+    chunks: ["encourage people to work harder", "motivate continuous improvement", "raise quality standards", "offer better products and services", "benefit customers and society"],
+  },
+  {
+    title: "Rules & responsibility",
+    chunks: ["set clear expectations", "encourage responsible behavior", "protect fairness", "prevent avoidable problems", "create a safer environment"],
+  },
+  {
+    title: "Rewards & recognition",
+    chunks: ["recognize effort and achievement", "increase motivation", "encourage positive behavior", "improve participation", "produce better results"],
+  },
+  {
+    title: "Diversity & perspectives",
+    chunks: ["bring together different backgrounds", "explore new perspectives", "challenge fixed assumptions", "encourage creative thinking", "make better decisions"],
+  },
+  {
+    title: "Local business",
+    chunks: ["create local jobs", "keep money in the community", "provide personalized service", "strengthen the local economy", "improve community well-being"],
+  },
+  {
+    title: "Cultural awareness",
+    chunks: ["experience different traditions", "understand cultural differences", "become more open-minded", "communicate respectfully", "build positive international relationships"],
+  },
+  {
+    title: "Social activities",
+    chunks: ["meet people with similar interests", "start natural conversations", "develop social skills", "form meaningful friendships", "feel a stronger sense of belonging"],
+  },
+  {
+    title: "Facilities & equipment",
+    chunks: ["provide the right tools", "complete tasks more efficiently", "improve safety and comfort", "deliver higher-quality results", "increase user satisfaction"],
+  },
+  {
+    title: "Personal responsibility",
+    chunks: ["make independent choices", "learn from consequences", "develop self-discipline", "become more responsible", "prepare for adult life"],
+  },
+  {
+    title: "Long-term investment",
+    chunks: ["accept higher initial costs", "gain lasting benefits", "reduce future expenses", "avoid frequent replacements", "receive better long-term value"],
+  },
 ];
 
 const speakingChunks: Collocation[] = speakingRoutes.flatMap((route, routeIndex) =>

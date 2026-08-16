@@ -291,7 +291,7 @@ export default function Home() {
         <button className="brand" onClick={() => setScreen("setup")} aria-label="Về trang chính">
           <span className="brand-mark">C</span>
           <span>Collocation<span className="brand-accent">Gym</span></span>
-          <span className="version-badge">V5</span>
+          <span className="version-badge">V6</span>
         </button>
         <div className="top-stats" aria-label="Thống kê">
           <span><b>{collocations.length}</b> mục học</span>

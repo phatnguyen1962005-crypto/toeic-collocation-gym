@@ -8,12 +8,12 @@ Website luyện collocation, V-pattern, giới từ và chuỗi ý TOEIC Speakin
 
 ## Có gì bên trong?
 
-- 577 mục học: 400 collocation, 105 mẫu Writing và 72 câu Speaking Idea Sprint
+- 665 mục học: 400 collocation, 105 mẫu Writing và 160 câu Speaking Idea Sprint
 - 240 collocation thực chiến và 160 cụm danh từ
 - 55 cụm dành cho email TOEIC
 - 46 câu V-pattern: `V + to V`, `V + V-ing`, `V + O + to V`
 - 59 câu giới từ: verb + preposition, cấu trúc tân ngữ, `to + V-ing` và cụm Writing
-- 18 idea chain Speaking dùng lại được cho nhiều chủ đề, chia thành 72 câu nối chunk hoàn toàn bằng tiếng Anh
+- 40 idea chain Speaking dùng lại được cho nhiều chủ đề, chia thành 160 câu nối chunk hoàn toàn bằng tiếng Anh
 - Speaking Sprint chạy liên tục, tự chuyển câu và có đồng hồ 30, 60, 90 hoặc 120 giây
 - Đánh dấu ★ các mục Writing cần lưu ý, tự lưu bằng `localStorage` và ôn riêng trong bộ **Đã lưu**
 - Chọn buổi luyện 10, 20, 50 hoặc toàn bộ câu
