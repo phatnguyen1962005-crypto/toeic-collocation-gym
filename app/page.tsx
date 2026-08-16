@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { collocations, type Collocation } from "./collocations";
 
 type Screen = "setup" | "quiz" | "result";
-type DeckFilter = "all" | "core" | "noun" | "email" | "verb-pattern" | "preposition" | "speaking";
+type DeckFilter = "all" | "core" | "noun" | "email" | "verb-pattern" | "preposition" | "saved" | "speaking";
 type AnswerRecord = { item: Collocation; chosen: string; correct: boolean };
 
 const shuffle = <T,>(values: T[]) => {
@@ -49,16 +49,18 @@ const deckLabels: Array<{ id: DeckFilter; label: string; icon: string }> = [
   { id: "email", label: "Email", icon: "@" },
   { id: "verb-pattern", label: "V-pattern", icon: "V" },
   { id: "preposition", label: "Giới từ", icon: "P" },
+  { id: "saved", label: "Đã lưu", icon: "★" },
   { id: "speaking", label: "Idea Sprint", icon: "⚡" },
 ];
 
-function filterDeck(filter: DeckFilter) {
+function filterDeck(filter: DeckFilter, savedIds: number[] = []) {
   if (filter === "all") return collocations.filter((item) => item.kind !== "speaking");
   if (filter === "core") return collocations.filter((item) => !item.topic.startsWith("Cụm danh từ") && !item.kind);
   if (filter === "noun") return collocations.filter((item) => item.topic.startsWith("Cụm danh từ"));
   if (filter === "email") return collocations.filter((item) => item.topic.includes("Email"));
   if (filter === "verb-pattern") return collocations.filter((item) => item.kind === "verb-pattern");
   if (filter === "preposition") return collocations.filter((item) => item.kind === "preposition");
+  if (filter === "saved") return collocations.filter((item) => savedIds.includes(item.id) && item.kind !== "speaking");
   return collocations.filter((item) => item.kind === "speaking");
 }
 
@@ -85,6 +87,7 @@ export default function Home() {
   const [streak, setStreak] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [soundOn, setSoundOn] = useState(true);
+  const [savedIds, setSavedIds] = useState<number[]>([]);
   const audioRef = useRef<AudioContext | null>(null);
   const answersRef = useRef<AnswerRecord[]>([]);
   const deadlineRef = useRef(0);
@@ -92,14 +95,29 @@ export default function Home() {
   useEffect(() => {
     const storedBest = window.localStorage.getItem("toeic-collocation-best");
     const storedSound = window.localStorage.getItem("toeic-collocation-sound");
+    const storedSaved = window.localStorage.getItem("toeic-collocation-saved");
     // Restoring browser-only preferences after hydration is intentional.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (storedBest) setBestScore(Number(storedBest));
     if (storedSound) setSoundOn(storedSound === "on");
+    if (storedSaved) {
+      try {
+        const parsed = JSON.parse(storedSaved);
+        if (Array.isArray(parsed)) {
+          const validWritingIds = parsed.filter((id): id is number =>
+            typeof id === "number" && collocations.some((item) => item.id === id && item.kind !== "speaking"),
+          );
+          setSavedIds([...new Set(validWritingIds)]);
+        }
+      } catch {
+        window.localStorage.removeItem("toeic-collocation-saved");
+      }
+    }
   }, []);
 
-  const activePool = useMemo(() => filterDeck(deckFilter), [deckFilter]);
+  const activePool = useMemo(() => filterDeck(deckFilter, savedIds), [deckFilter, savedIds]);
   const isSpeakingSetup = deckFilter === "speaking";
+  const isSavedSetup = deckFilter === "saved";
   const isSpeakingSession = questions[0]?.kind === "speaking";
   const sessionChoices = useMemo(
     () => [...new Set([10, 20, 50, activePool.length])].filter((count) => count <= activePool.length),
@@ -147,10 +165,24 @@ export default function Home() {
     });
   };
 
+  const toggleSaved = (itemId: number) => {
+    setSavedIds((previous) => {
+      const next = previous.includes(itemId)
+        ? previous.filter((id) => id !== itemId)
+        : [...previous, itemId];
+      window.localStorage.setItem("toeic-collocation-saved", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const selectDeck = (filter: DeckFilter) => {
-    const nextPoolLength = filterDeck(filter).length;
+    const nextPoolLength = filterDeck(filter, savedIds).length;
     setDeckFilter(filter);
-    setQuestionCount((previous) => previous > nextPoolLength ? Math.min(20, nextPoolLength) : previous);
+    setQuestionCount((previous) => {
+      if (nextPoolLength === 0) return 0;
+      if (previous === 0 || previous > nextPoolLength) return Math.min(20, nextPoolLength);
+      return previous;
+    });
   };
 
   const finishQuiz = useCallback(() => {
@@ -259,11 +291,14 @@ export default function Home() {
         <button className="brand" onClick={() => setScreen("setup")} aria-label="Về trang chính">
           <span className="brand-mark">C</span>
           <span>Collocation<span className="brand-accent">Gym</span></span>
-          <span className="version-badge">V4</span>
+          <span className="version-badge">V5</span>
         </button>
         <div className="top-stats" aria-label="Thống kê">
           <span><b>{collocations.length}</b> mục học</span>
           <span className="best-chip">Kỷ lục <b>{bestScore}%</b></span>
+          <button className="saved-chip" onClick={() => { selectDeck("saved"); setScreen("setup"); }} title="Mở bộ Writing đã lưu">
+            ★ <b>{savedIds.length}</b> đã lưu
+          </button>
           <button className="sound-toggle" onClick={toggleSound} aria-label={soundOn ? "Tắt âm thanh" : "Bật âm thanh"} title={soundOn ? "Tắt âm thanh" : "Bật âm thanh"}>
             <span className={soundOn ? "sound-waves active" : "sound-waves"}>{soundOn ? "♪" : "×"}</span>
           </button>
@@ -287,6 +322,7 @@ export default function Home() {
             <div className="feature-row">
               <span>V + V-ing / to V</span><i />
               <span>Cụm giới từ</span><i />
+              <span>★ Lưu để ôn riêng</span><i />
               <span>Speaking idea chains</span>
             </div>
           </div>
@@ -296,9 +332,14 @@ export default function Home() {
             <p className="label"><span>01</span> Chọn bộ muốn luyện</p>
             <div className="deck-picker" role="group" aria-label="Chọn bộ kiến thức">
               {deckLabels.map((deck) => {
-                const count = filterDeck(deck.id).length;
+                const count = filterDeck(deck.id, savedIds).length;
+                const deckClass = [
+                  deckFilter === deck.id ? "active" : "",
+                  deck.id === "speaking" ? "speaking-deck" : "",
+                  deck.id === "saved" ? "saved-deck" : "",
+                ].filter(Boolean).join(" ");
                 return (
-                  <button key={deck.id} className={deckFilter === deck.id ? "active" : ""} onClick={() => selectDeck(deck.id)}>
+                  <button key={deck.id} className={deckClass} onClick={() => selectDeck(deck.id)}>
                     <span className="deck-symbol">{deck.icon}</span>
                     <span><b>{deck.label}</b><small>{count} mục</small></span>
                   </button>
@@ -307,7 +348,12 @@ export default function Home() {
             </div>
 
             <p className="label session-label"><span>02</span> {isSpeakingSetup ? "Chọn thời gian phản xạ" : "Chọn độ dài buổi tập"}</p>
-            {isSpeakingSetup ? (
+            {isSavedSetup && activePool.length === 0 ? (
+              <div className="empty-saved">
+                <span>☆</span>
+                <div><b>Chưa có mục nào được lưu</b><small>Vào một bộ Writing và bấm “Lưu ý” trên câu bạn muốn nhớ kỹ.</small></div>
+              </div>
+            ) : isSpeakingSetup ? (
               <div className="count-picker timer-picker" role="group" aria-label="Thời gian Speaking Sprint">
                 {[30, 60, 90, 120].map((seconds) => (
                   <button key={seconds} className={sessionSeconds === seconds ? "active" : ""} onClick={() => setSessionSeconds(seconds)}>
@@ -325,11 +371,13 @@ export default function Home() {
                 ))}
               </div>
             )}
-            <button className="primary-button" onClick={() => startQuiz()}>
-              <span className="button-spark">✦</span> {isSpeakingSetup ? "Bắt đầu Idea Sprint" : "Bắt đầu luyện"} <span>→</span>
+            <button className="primary-button" onClick={() => startQuiz()} disabled={activePool.length === 0}>
+              <span className="button-spark">✦</span> {activePool.length === 0 ? "Chưa có mục đã lưu" : isSpeakingSetup ? "Bắt đầu Idea Sprint" : isSavedSetup ? "Ôn bộ đã lưu" : "Bắt đầu luyện"} <span>→</span>
             </button>
             <p className="shortcut-note">
-              {isSpeakingSetup
+              {isSavedSetup && activePool.length === 0
+                ? <>Dấu ★ được lưu ngay trên thiết bị này.</>
+                : isSpeakingSetup
                 ? <>Chọn bằng phím <kbd>1</kbd>–<kbd>4</kbd> · tự chuyển chunk sau 0.65 giây</>
                 : <>Dùng phím <kbd>1</kbd>–<kbd>4</kbd> để chọn · <kbd>Enter</kbd> để tiếp tục</>}
             </p>
@@ -352,7 +400,19 @@ export default function Home() {
           </div>
           <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
 
-          <article key={`${current.id}-${index}`} className={`question-card question-enter ${selected === current.en ? "correct-state" : selected ? "wrong-state" : ""}`}>
+          <article key={`${current.id}-${index}`} className={`question-card question-enter ${!isSpeakingQuestion ? "writing-card" : ""} ${selected === current.en ? "correct-state" : selected ? "wrong-state" : ""}`}>
+            {!isSpeakingQuestion && (
+              <button
+                className={`bookmark-button ${savedIds.includes(current.id) ? "saved" : ""}`}
+                onClick={() => toggleSaved(current.id)}
+                aria-label={savedIds.includes(current.id) ? "Bỏ khỏi bộ Writing đã lưu" : "Lưu mục Writing này để ôn riêng"}
+                aria-pressed={savedIds.includes(current.id)}
+                title={savedIds.includes(current.id) ? "Bỏ lưu" : "Lưu để ôn riêng"}
+              >
+                <span>{savedIds.includes(current.id) ? "★" : "☆"}</span>
+                {savedIds.includes(current.id) ? "Đã lưu" : "Lưu ý"}
+              </button>
+            )}
             <div className="topic-line">
               <span>{current.topic}</span><i />
               <b>{isSpeakingQuestion ? `STEP ${(current.chunkStep ?? 0) + 1}/5` : `#${current.id}`}</b>
