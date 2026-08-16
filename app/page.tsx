@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { collocations, type Collocation } from "./collocations";
 
 type Screen = "setup" | "quiz" | "result";
-type DeckFilter = "all" | "core" | "noun" | "email";
+type DeckFilter = "all" | "core" | "noun" | "email" | "verb-pattern" | "preposition";
 type AnswerRecord = { item: Collocation; chosen: string; correct: boolean };
 
 const shuffle = <T,>(values: T[]) => {
@@ -28,17 +28,28 @@ function buildOptions(item: Collocation) {
   return shuffle([item.en, ...uniqueDistractors]);
 }
 
+function formatAnswer(item: Collocation) {
+  if (item.kind === "verb-pattern" && item.pattern) {
+    return item.pattern.replace("___", item.en);
+  }
+  return item.en;
+}
+
 const deckLabels: Array<{ id: DeckFilter; label: string; icon: string }> = [
   { id: "all", label: "Tất cả", icon: "✦" },
   { id: "core", label: "Collocation", icon: "↗" },
   { id: "noun", label: "Cụm danh từ", icon: "N" },
   { id: "email", label: "Email", icon: "@" },
+  { id: "verb-pattern", label: "V-pattern", icon: "V" },
+  { id: "preposition", label: "Giới từ", icon: "P" },
 ];
 
 function filterDeck(filter: DeckFilter) {
-  if (filter === "core") return collocations.filter((item) => !item.topic.startsWith("Cụm danh từ"));
+  if (filter === "core") return collocations.filter((item) => !item.topic.startsWith("Cụm danh từ") && !item.kind);
   if (filter === "noun") return collocations.filter((item) => item.topic.startsWith("Cụm danh từ"));
   if (filter === "email") return collocations.filter((item) => item.topic.includes("Email"));
+  if (filter === "verb-pattern") return collocations.filter((item) => item.kind === "verb-pattern");
+  if (filter === "preposition") return collocations.filter((item) => item.kind === "preposition");
   return collocations;
 }
 
@@ -59,6 +70,8 @@ export default function Home() {
   useEffect(() => {
     const storedBest = window.localStorage.getItem("toeic-collocation-best");
     const storedSound = window.localStorage.getItem("toeic-collocation-sound");
+    // Restoring browser-only preferences after hydration is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (storedBest) setBestScore(Number(storedBest));
     if (storedSound) setSoundOn(storedSound === "on");
   }, []);
@@ -68,10 +81,6 @@ export default function Home() {
     () => [...new Set([10, 20, 50, activePool.length])].filter((count) => count <= activePool.length),
     [activePool.length],
   );
-
-  useEffect(() => {
-    if (questionCount > activePool.length) setQuestionCount(Math.min(20, activePool.length));
-  }, [activePool.length, questionCount]);
 
   const current = questions[index];
   const correctCount = answers.filter((answer) => answer.correct).length;
@@ -110,6 +119,12 @@ export default function Home() {
       window.localStorage.setItem("toeic-collocation-sound", next ? "on" : "off");
       return next;
     });
+  };
+
+  const selectDeck = (filter: DeckFilter) => {
+    const nextPoolLength = filterDeck(filter).length;
+    setDeckFilter(filter);
+    setQuestionCount((previous) => previous > nextPoolLength ? Math.min(20, nextPoolLength) : previous);
   };
 
   const startQuiz = useCallback((customQuestions?: Collocation[]) => {
@@ -166,6 +181,12 @@ export default function Home() {
 
   const wrongAnswers = useMemo(() => answers.filter((answer) => !answer.correct), [answers]);
   const finalPercent = questions.length ? Math.round((correctCount / questions.length) * 100) : 0;
+  const isVerbPattern = current?.kind === "verb-pattern";
+  const questionLabel = isVerbPattern
+    ? "Chọn động từ đúng để hoàn thành mẫu:"
+    : current?.kind === "preposition"
+      ? "Chọn cụm tiếng Anh đúng với nghĩa:"
+      : "Chọn collocation tiếng Anh đúng với:";
 
   return (
     <main className="app-shell">
@@ -175,10 +196,10 @@ export default function Home() {
         <button className="brand" onClick={() => setScreen("setup")} aria-label="Về trang chính">
           <span className="brand-mark">C</span>
           <span>Collocation<span className="brand-accent">Gym</span></span>
-          <span className="version-badge">V2</span>
+          <span className="version-badge">V3</span>
         </button>
         <div className="top-stats" aria-label="Thống kê">
-          <span><b>{collocations.length}</b> cụm từ</span>
+          <span><b>{collocations.length}</b> mục học</span>
           <span className="best-chip">Kỷ lục <b>{bestScore}%</b></span>
           <button className="sound-toggle" onClick={toggleSound} aria-label={soundOn ? "Tắt âm thanh" : "Bật âm thanh"} title={soundOn ? "Tắt âm thanh" : "Bật âm thanh"}>
             <span className={soundOn ? "sound-waves active" : "sound-waves"}>{soundOn ? "♪" : "×"}</span>
@@ -189,20 +210,20 @@ export default function Home() {
       {screen === "setup" && (
         <section className="setup-grid screen-enter">
           <div className="hero-copy">
-            <p className="eyebrow"><span className="live-dot" /> TOEIC SPEAKING &amp; WRITING</p>
-            <h1>Nhìn tiếng Việt.<br /><em>Bật đúng cụm Anh.</em></h1>
+            <p className="eyebrow"><span className="live-dot" /> TOEIC WRITING PATTERN GYM</p>
+            <h1>Nhìn nghĩa, nhìn mẫu.<br /><em>Bật đúng tiếng Anh.</em></h1>
             <p className="hero-description">
-              Học theo phản xạ với âm thanh, hiệu ứng ghi nhớ và bộ câu hỏi chia đúng nhóm.
+              Luyện collocation, cụm danh từ, V-pattern và giới từ theo đúng kiểu dùng trong TOEIC Writing.
               Sai ở đâu, gom lại luyện tiếp ở đó.
             </p>
             <div className="hero-metrics">
-              <div><strong>{collocations.length}</strong><span>CỤM THỰC CHIẾN</span></div>
+              <div><strong>{collocations.length}</strong><span>MỤC THỰC CHIẾN</span></div>
               <div><strong>{new Set(collocations.map((item) => item.topic)).size}</strong><span>NHÓM CHỦ ĐỀ</span></div>
               <div><strong>∞</strong><span>LƯỢT ÔN SAI</span></div>
             </div>
             <div className="feature-row">
-              <span>Âm thanh phản hồi</span><i />
-              <span>Hiệu ứng ghi nhớ</span><i />
+              <span>V + V-ing / to V</span><i />
+              <span>Cụm giới từ</span><i />
               <span>Ôn câu sai</span>
             </div>
           </div>
@@ -210,13 +231,13 @@ export default function Home() {
           <div className="setup-card">
             <div className="card-number">{collocations.length}</div>
             <p className="label"><span>01</span> Chọn bộ muốn luyện</p>
-            <div className="deck-picker" role="group" aria-label="Chọn bộ collocation">
+            <div className="deck-picker" role="group" aria-label="Chọn bộ kiến thức">
               {deckLabels.map((deck) => {
                 const count = filterDeck(deck.id).length;
                 return (
-                  <button key={deck.id} className={deckFilter === deck.id ? "active" : ""} onClick={() => setDeckFilter(deck.id)}>
+                  <button key={deck.id} className={deckFilter === deck.id ? "active" : ""} onClick={() => selectDeck(deck.id)}>
                     <span className="deck-symbol">{deck.icon}</span>
-                    <span><b>{deck.label}</b><small>{count} cụm</small></span>
+                    <span><b>{deck.label}</b><small>{count} mục</small></span>
                   </button>
                 );
               })}
@@ -227,7 +248,7 @@ export default function Home() {
               {sessionChoices.map((count) => (
                 <button key={count} className={questionCount === count ? "active" : ""} onClick={() => setQuestionCount(count)}>
                   <b>{count === activePool.length ? "ALL" : count}</b>
-                  <span>{count === activePool.length ? `${count} cụm` : "câu"}</span>
+                  <span>{count === activePool.length ? `${count} mục` : "câu"}</span>
                 </button>
               ))}
             </div>
@@ -250,8 +271,9 @@ export default function Home() {
 
           <article key={`${current.id}-${index}`} className={`question-card question-enter ${selected === current.en ? "correct-state" : selected ? "wrong-state" : ""}`}>
             <div className="topic-line"><span>{current.topic}</span><i /><b>#{current.id}</b></div>
-            <p className="question-label">Chọn collocation tiếng Anh đúng với:</p>
-            <h2>{current.vi}</h2>
+            <p className="question-label">{questionLabel}</p>
+            <h2 className={isVerbPattern ? "pattern-question" : ""}>{isVerbPattern ? current.pattern : current.vi}</h2>
+            {isVerbPattern && <p className="question-hint">Nghĩa cần chọn: <b>{current.vi}</b></p>}
             <div className="answer-grid">
               {options.map((option, optionIndex) => {
                 const isCorrect = Boolean(selected && option === current.en);
@@ -272,7 +294,8 @@ export default function Home() {
                 {selected === current.en && <div className="mini-burst" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>}
                 <div>
                   <b>{selected === current.en ? (streak >= 3 ? `${streak} câu liên tiếp — quá bén!` : "Chuẩn bài!") : "Chưa đúng — khóa cụm này vào trí nhớ:"}</b>
-                  <p><span>{current.vi}</span> → {current.en}</p>
+                  <p><span>{current.vi}</span> → {formatAnswer(current)}</p>
+                  {current.note && <small className="answer-note">⚑ {current.note}</small>}
                 </div>
                 <button onClick={nextQuestion}>{index === questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo"} <span>→</span></button>
               </div>
@@ -308,7 +331,7 @@ export default function Home() {
             <div className="review-list">
               <div className="review-heading"><b>Cụm cần ôn</b><span>{wrongAnswers.length} mục</span></div>
               {wrongAnswers.map(({ item }) => (
-                <div className="review-item" key={item.id}><span>{item.vi}</span><b>{item.en}</b></div>
+                <div className="review-item" key={item.id}><span>{item.vi}</span><b>{formatAnswer(item)}</b></div>
               ))}
             </div>
           )}

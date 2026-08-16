@@ -3,9 +3,12 @@ export type Collocation = {
   vi: string;
   en: string;
   topic: string;
+  kind?: "verb-pattern" | "preposition";
+  pattern?: string;
+  note?: string;
 };
 
-export const collocations: Collocation[] = [
+const baseCollocations: Collocation[] = [
   { id: 1, vi: "Ngồi tại bàn", en: "be seated at a table", topic: "Miêu tả tranh" },
   { id: 2, vi: "Đứng xếp hàng", en: "be standing in line", topic: "Miêu tả tranh" },
   { id: 3, vi: "Đi bộ qua đường", en: "walk across the street", topic: "Miêu tả tranh" },
@@ -422,4 +425,171 @@ export const collocations: Collocation[] = [
   { id: 398, vi: "Chỗ ở khách sạn", en: "hotel accommodation", topic: "Cụm danh từ · Kinh doanh & du lịch" },
   { id: 399, vi: "Lịch bay", en: "flight schedule", topic: "Cụm danh từ · Kinh doanh & du lịch" },
   { id: 400, vi: "Giờ khởi hành", en: "departure time", topic: "Cụm danh từ · Kinh doanh & du lịch" },
+];
+
+type StudyItem = {
+  vi: string;
+  en: string;
+  note?: string;
+};
+
+const makeVerbPatterns = (
+  startId: number,
+  pattern: string,
+  topic: string,
+  items: StudyItem[],
+): Collocation[] => items.map((item, index) => ({
+  ...item,
+  id: startId + index,
+  topic,
+  kind: "verb-pattern",
+  pattern,
+}));
+
+const makePrepositions = (
+  startId: number,
+  topic: string,
+  items: StudyItem[],
+): Collocation[] => items.map((item, index) => ({
+  ...item,
+  id: startId + index,
+  topic,
+  kind: "preposition",
+}));
+
+const verbToInfinitive = makeVerbPatterns(401, "___ + to V", "V-pattern · V + to V", [
+  { vi: "đồng ý làm gì", en: "agree" },
+  { vi: "sắp xếp để làm gì", en: "arrange" },
+  { vi: "quyết định làm gì", en: "decide" },
+  { vi: "mong đợi làm gì", en: "expect" },
+  { vi: "không làm được việc gì", en: "fail" },
+  { vi: "hy vọng làm gì", en: "hope" },
+  { vi: "học cách làm gì", en: "learn" },
+  { vi: "xoay xở làm được gì", en: "manage" },
+  { vi: "cần làm gì", en: "need" },
+  { vi: "đề nghị làm gì", en: "offer" },
+  { vi: "lên kế hoạch làm gì", en: "plan" },
+  { vi: "chuẩn bị làm gì", en: "prepare" },
+  { vi: "hứa làm gì", en: "promise" },
+  { vi: "từ chối làm gì", en: "refuse" },
+  { vi: "có vẻ làm gì", en: "seem" },
+  { vi: "muốn làm gì", en: "want" },
+]);
+
+const verbGerund = makeVerbPatterns(417, "___ + V-ing", "V-pattern · V + V-ing", [
+  { vi: "thừa nhận đã làm gì", en: "admit" },
+  { vi: "đề xuất làm gì", en: "suggest", note: "suggest + V-ing; hoặc suggest that + S + V" },
+  { vi: "khuyến nghị làm gì", en: "recommend", note: "recommend + V-ing; hoặc recommend that + S + V" },
+  { vi: "tránh làm gì", en: "avoid", note: "Không dùng avoid + to V." },
+  { vi: "trì hoãn làm gì", en: "delay" },
+  { vi: "hoãn làm gì", en: "postpone" },
+  { vi: "nhớ hoặc tiếc việc từng làm", en: "miss" },
+  { vi: "thích làm gì", en: "enjoy" },
+  { vi: "phiền khi làm gì", en: "mind" },
+  { vi: "hoàn thành việc gì", en: "finish" },
+  { vi: "tiếp tục làm gì", en: "keep" },
+  { vi: "luyện tập làm gì", en: "practice" },
+  { vi: "cân nhắc làm gì", en: "consider" },
+  { vi: "thảo luận việc làm gì", en: "discuss" },
+  { vi: "có nguy cơ làm gì", en: "risk" },
+]);
+
+const verbObjectInfinitive = makeVerbPatterns(432, "___ + O + to V", "V-pattern · V + O + to V", [
+  { vi: "khuyên ai làm gì", en: "advise" },
+  { vi: "nhắc ai làm gì", en: "remind" },
+  { vi: "chỉ dẫn hoặc yêu cầu ai làm gì", en: "instruct" },
+  { vi: "cho phép ai làm gì", en: "allow" },
+  { vi: "tạo điều kiện cho ai làm gì", en: "enable" },
+  { vi: "khuyến khích ai làm gì", en: "encourage" },
+  { vi: "tạo động lực cho ai làm gì", en: "motivate" },
+  { vi: "yêu cầu hoặc nhờ ai làm gì", en: "ask" },
+  { vi: "yêu cầu ai phải làm gì", en: "require" },
+  { vi: "mời ai làm gì", en: "invite" },
+  { vi: "buộc ai làm gì", en: "force" },
+  { vi: "khiến ai hoặc điều gì làm gì", en: "cause" },
+  { vi: "mong đợi ai làm gì", en: "expect" },
+  { vi: "muốn ai làm gì", en: "want" },
+  { vi: "cần ai làm gì", en: "need" },
+]);
+
+const verbPrepositions = makePrepositions(447, "Giới từ · Verb + preposition", [
+  { vi: "ứng tuyển hoặc nộp đơn xin", en: "apply for" },
+  { vi: "xin lỗi vì", en: "apologize for" },
+  { vi: "đồng ý với một người hoặc ý kiến", en: "agree with", note: "agree with + người/ý kiến" },
+  { vi: "thống nhất về một vấn đề hoặc kế hoạch", en: "agree on", note: "agree on + vấn đề/kế hoạch" },
+  { vi: "tìm kiếm", en: "look for" },
+  { vi: "thuộc về", en: "belong to" },
+  { vi: "phàn nàn về", en: "complain about" },
+  { vi: "tập trung vào", en: "focus/concentrate on" },
+  { vi: "bao gồm, được cấu thành từ", en: "consist of" },
+  { vi: "dành tiền hoặc thời gian cho", en: "spend on", note: "spend money/time on + N/V-ing; không dùng spend for." },
+  { vi: "đóng góp hoặc góp phần vào", en: "contribute to" },
+  { vi: "phụ thuộc vào", en: "depend on" },
+  { vi: "tham gia vào", en: "participate in" },
+  { vi: "đề cập hoặc tham chiếu đến", en: "refer to" },
+  { vi: "trả tiền cho", en: "pay for" },
+  { vi: "dẫn đến một kết quả", en: "result in" },
+  { vi: "thành công trong", en: "succeed in" },
+  { vi: "chờ đợi", en: "wait for" },
+  { vi: "chuẩn bị cho", en: "prepare for" },
+  { vi: "giao tiếp hoặc liên lạc với", en: "communicate with" },
+]);
+
+const objectPrepositions = makePrepositions(467, "Giới từ · V + O + preposition", [
+  { vi: "cung cấp B cho A", en: "provide A with B" },
+  { vi: "thông báo cho A về B", en: "inform A of/about B" },
+  { vi: "nhắc A nhớ về B", en: "remind A of B" },
+  { vi: "cảm ơn A vì B", en: "thank A for B" },
+  { vi: "ngăn A làm gì", en: "prevent A from V-ing", note: "Sau from dùng V-ing." },
+  { vi: "bảo vệ A khỏi B", en: "protect A from B" },
+  { vi: "tính phí A cho B", en: "charge A for B" },
+  { vi: "mời A đến B", en: "invite A to B", note: "invite A to + sự kiện/địa điểm; invite A to V khi mời ai làm gì." },
+]);
+
+const prepositionalTo = makePrepositions(475, "Giới từ · To + V-ing", [
+  { vi: "cam kết làm gì", en: "be committed to + V-ing", note: "to là giới từ, vì vậy theo sau bằng V-ing/N." },
+  { vi: "quen với việc làm gì", en: "be used to + V-ing", note: "Khác used to + V: từng làm gì trong quá khứ." },
+  { vi: "phản đối việc làm gì", en: "be opposed to + V-ing" },
+  { vi: "phải chịu hoặc tuân theo", en: "be subject to + N/V-ing" },
+  { vi: "mong chờ làm gì", en: "look forward to + V-ing" },
+  { vi: "phản đối việc làm gì", en: "object to + V-ing" },
+  { vi: "góp phần vào việc làm gì", en: "contribute to + V-ing" },
+  { vi: "dẫn đến việc làm gì", en: "lead to + V-ing" },
+  { vi: "cống hiến bản thân cho việc gì", en: "dedicate oneself to + V-ing" },
+  { vi: "phải dùng đến biện pháp làm gì", en: "resort to + V-ing" },
+]);
+
+const writingPrepositions = makePrepositions(485, "Giới từ · Cụm Writing", [
+  { vi: "trước, báo hoặc làm sớm hơn", en: "in advance" },
+  { vi: "đầy đủ, toàn bộ", en: "in full" },
+  { vi: "trực tiếp, đích thân", en: "in person" },
+  { vi: "một cách chi tiết", en: "in detail" },
+  { vi: "đang được tiến hành", en: "in progress" },
+  { vi: "đã sẵn sàng hoặc đã được thiết lập", en: "in place" },
+  { vi: "với số lượng lớn", en: "in bulk" },
+  { vi: "nói chung", en: "in general" },
+  { vi: "ngoài việc, bên cạnh việc", en: "in addition to + N/V-ing" },
+  { vi: "ngoài ra hoặc ngoại trừ", en: "apart from + N/V-ing" },
+  { vi: "thay vì", en: "instead of + N/V-ing" },
+  { vi: "do, bởi vì", en: "due to + N/V-ing" },
+  { vi: "do, bởi vì (trang trọng)", en: "owing to + N/V-ing" },
+  { vi: "bởi vì", en: "because of + N/V-ing" },
+  { vi: "nhằm mục đích làm gì", en: "with a view to + V-ing", note: "to là giới từ, không dùng to V." },
+  { vi: "trước một mốc hoặc sự kiện", en: "prior to + N/V-ing" },
+  { vi: "được lên lịch để làm gì", en: "be scheduled to + V", note: "Ở đây to mở đầu động từ nguyên mẫu." },
+  { vi: "được xem là + tính từ hoặc danh từ", en: "be deemed + adjective/noun" },
+  { vi: "được đánh giá là sẽ làm gì", en: "be judged to + V" },
+  { vi: "mà phải chịu hoặc tuân theo", en: "which is subject to + N" },
+  { vi: "xảy ra hoặc có hiệu lực trước", en: "be prior to + N/V-ing" },
+]);
+
+export const collocations: Collocation[] = [
+  ...baseCollocations,
+  ...verbToInfinitive,
+  ...verbGerund,
+  ...verbObjectInfinitive,
+  ...verbPrepositions,
+  ...objectPrepositions,
+  ...prepositionalTo,
+  ...writingPrepositions,
 ];

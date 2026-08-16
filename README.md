@@ -1,6 +1,6 @@
 # TOEIC Collocation Gym
 
-Website luyện collocation TOEIC Speaking & Writing theo luật: **hiện nghĩa tiếng Việt trước, chọn collocation tiếng Anh đúng sau**.
+Website luyện collocation, V-pattern và giới từ TOEIC Speaking & Writing bằng trắc nghiệm phản xạ.
 
 ## Demo
 
@@ -8,9 +8,11 @@ Website luyện collocation TOEIC Speaking & Writing theo luật: **hiện nghĩ
 
 ## Có gì bên trong?
 
-- 400 collocation không trùng lặp
+- 505 mục học: 400 collocation và 105 mẫu Writing mới
 - 240 collocation thực chiến và 160 cụm danh từ
 - 55 cụm dành cho email TOEIC
+- 46 câu V-pattern: `V + to V`, `V + V-ing`, `V + O + to V`
+- 59 câu giới từ: verb + preposition, cấu trúc tân ngữ, `to + V-ing` và cụm Writing
 - Chọn buổi luyện 10, 20, 50 hoặc toàn bộ câu
 - Âm thanh đúng/sai, streak, hiệu ứng và confetti
 - Phím tắt `1`–`4` để chọn, `Enter` để sang câu tiếp theo
@@ -39,7 +41,7 @@ Next.js sẽ xuất website tĩnh vào thư mục `out/`. Workflow trong `.githu
 
 ## Cấu trúc chính
 
-- `app/collocations.ts`: toàn bộ dữ liệu 400 cụm Việt–Anh
+- `app/collocations.ts`: toàn bộ dữ liệu collocation, V-pattern và giới từ
 - `app/page.tsx`: logic trắc nghiệm, âm thanh, điểm và ôn câu sai
 - `app/globals.css`: giao diện, responsive và animation
 - `.github/workflows/deploy-pages.yml`: tự động build và deploy GitHub Pages
