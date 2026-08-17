@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Grammar Pattern Gym Pro — 20 cấu trúc Writing</title>
+<title>Grammar Pattern Gym Pro — 60 TOEIC Writing Patterns</title>
 <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
   <section class="hero">
     <div>
       <h1>Grammar Pattern Gym Pro</h1>
-      <p class="subtitle">20 cấu trúc Writing • quiz VI → EN • đánh dấu • sổ lỗi sai • thống kê cấu trúc yếu • âm thanh & hiệu ứng</p>
+      <p class="subtitle">60 TOEIC Writing patterns • 20 Core + 20 Email + 20 Essay • quiz VI → EN • lỗi sai • adaptive review</p>
     </div>
     <div class="top-actions">
       <button class="btn soft" id="soundTop">🔊 Âm thanh</button>
@@ -37,7 +37,11 @@
 
   <section id="quizPanel" class="panel active">
     <div class="navbar">
-      <button class="btn primary modeBtn" data-mode="all">Đủ 20</button>
+      <button class="btn primary modeBtn" data-mode="mix">Mix 20</button>
+      <button class="btn modeBtn" data-mode="core">Core 20</button>
+      <button class="btn modeBtn" data-mode="email">Email 20</button>
+      <button class="btn modeBtn" data-mode="essay">Essay 20</button>
+      <button class="btn modeBtn" data-mode="all">All 60</button>
       <button class="btn modeBtn" data-mode="wrong">Ôn câu sai</button>
       <button class="btn modeBtn" data-mode="weak">Cấu trúc yếu</button>
       <button class="btn modeBtn" data-mode="marked">⭐ Đã đánh dấu</button>
@@ -45,7 +49,7 @@
     <div class="card">
       <div id="quizBox">
         <div class="progress-wrap"><div class="progress" id="progress"></div></div>
-        <div class="question-top"><span class="badge">VI → EN</span><span class="counter" id="counter"></span></div>
+        <div class="question-top"><div><span class="badge">VI → EN</span> <span class="badge" id="categoryBadge">CORE</span></div><span class="counter" id="counter"></span></div>
         <div class="vn-label">Nghĩa / chức năng</div>
         <div class="meaning" id="meaning"></div>
         <div class="hint" id="hint"></div>
@@ -66,16 +70,16 @@
         <div class="list" id="roundWrongList"></div>
       </div>
     </div>
-    <div class="mini">Phím tắt: 1–4 chọn đáp án • Enter sang câu tiếp • M đánh dấu.</div>
+    <div class="mini">Gợi ý: học riêng Email 20 và Essay 20 trước, sau đó dùng Mix 20 để phản xạ. Phím tắt: 1–4 chọn đáp án • Enter sang câu tiếp • M đánh dấu.</div>
   </section>
 
-  <section id="errorsPanel" class="panel"><div class="card"><div class="item-head"><div><h2 class="section-title">Sổ lỗi sai</h2><p class="section-sub">Lưu từng lần trả lời sai: cấu trúc, đáp án bạn chọn và đáp án đúng.</p></div><button class="btn danger" id="clearErrors">Xóa lịch sử lỗi</button></div><div id="errorList"></div></div></section>
+  <section id="errorsPanel" class="panel"><div class="card"><div class="item-head"><div><h2 class="section-title">Sổ lỗi sai</h2><p class="section-sub">Lưu từng lần trả lời sai: nhóm, cấu trúc, đáp án bạn chọn và đáp án đúng.</p></div><button class="btn danger" id="clearErrors">Xóa lịch sử lỗi</button></div><div id="errorList"></div></div></section>
 
-  <section id="statsPanel" class="panel"><div class="card"><h2 class="section-title">Thống kê theo cấu trúc</h2><p class="section-sub">Cấu trúc có accuracy thấp sẽ tự động xuất hiện trong chế độ “Cấu trúc yếu”.</p><div class="grid2" style="margin-bottom:16px"><div class="item"><b>Cấu trúc yếu nhất</b><small id="weakestText">Chưa đủ dữ liệu</small></div><div class="item"><b>Cấu trúc mạnh nhất</b><small id="strongestText">Chưa đủ dữ liệu</small></div></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Nghĩa</th><th>Đúng</th><th>Sai</th><th>Accuracy</th><th>Trạng thái</th></tr></thead><tbody id="statsBody"></tbody></table></div></div></section>
+  <section id="statsPanel" class="panel"><div class="card"><h2 class="section-title">Thống kê 60 cấu trúc</h2><p class="section-sub">Theo dõi Core / Email / Essay riêng từng pattern. Accuracy thấp sẽ được ưu tiên trong chế độ “Cấu trúc yếu”.</p><div class="grid2" style="margin-bottom:16px"><div class="item"><b>Cấu trúc yếu nhất</b><small id="weakestText">Chưa đủ dữ liệu</small></div><div class="item"><b>Cấu trúc mạnh nhất</b><small id="strongestText">Chưa đủ dữ liệu</small></div></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Nhóm / Pattern</th><th>Đúng</th><th>Sai</th><th>Accuracy</th><th>Trạng thái</th></tr></thead><tbody id="statsBody"></tbody></table></div></div></section>
 
-  <section id="markedPanel" class="panel"><div class="card"><h2 class="section-title">⭐ Cấu trúc đã đánh dấu</h2><p class="section-sub">Dùng như một bộ “tủ” cá nhân để ôn nhanh trước khi Writing.</p><div id="markedList"></div></div></section>
+  <section id="markedPanel" class="panel"><div class="card"><h2 class="section-title">⭐ Cấu trúc đã đánh dấu</h2><p class="section-sub">Tạo bộ pattern “tủ” cá nhân cho Email và Essay để ôn nhanh trước khi thi.</p><div id="markedList"></div></div></section>
 
-  <section id="settingsPanel" class="panel"><div class="card"><h2 class="section-title">Cài đặt trải nghiệm</h2><p class="section-sub">Mọi dữ liệu đều lưu trên trình duyệt bằng localStorage.</p><div class="settings-row"><div><b>Âm thanh đúng / sai</b><div class="subtitle">WebAudio, không cần tải file âm thanh.</div></div><button class="switch" id="soundSwitch"></button></div><div class="settings-row"><div><b>Hiệu ứng confetti</b><div class="subtitle">Xuất hiện khi đạt ≥ 80% hoặc chuỗi đúng dài.</div></div><button class="switch" id="fxSwitch"></button></div><div class="settings-row"><div><b>Tự động ưu tiên câu yếu</b><div class="subtitle">Trong chế độ đủ 20, câu có accuracy thấp được xếp sớm hơn.</div></div><button class="switch" id="adaptiveSwitch"></button></div></div></section>
+  <section id="settingsPanel" class="panel"><div class="card"><h2 class="section-title">Cài đặt trải nghiệm</h2><p class="section-sub">Mọi dữ liệu đều lưu trên trình duyệt bằng localStorage.</p><div class="settings-row"><div><b>Âm thanh đúng / sai</b><div class="subtitle">WebAudio, không cần tải file âm thanh.</div></div><button class="switch" id="soundSwitch"></button></div><div class="settings-row"><div><b>Hiệu ứng confetti</b><div class="subtitle">Xuất hiện khi đạt ≥ 80% hoặc chuỗi đúng dài.</div></div><button class="switch" id="fxSwitch"></button></div><div class="settings-row"><div><b>Tự động ưu tiên câu yếu</b><div class="subtitle">Pattern có accuracy thấp được xếp sớm hơn trong từng chế độ.</div></div><button class="switch" id="adaptiveSwitch"></button></div></div></section>
 </main>
 <script src="./app.js"></script>
 </body>
